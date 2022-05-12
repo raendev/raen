@@ -2,7 +2,7 @@
 authors = ["Willem Wyndham <willem@ahalabs.dev>"]
 description = "CLI for building and deploying NEAR smart Contracts"
 edition = "2021"
-keywords = ["WebAssembly", "Wasm", "wit", "WasmInterfaceTypes", "NEAR", "near"]
+keywords = ["WebAssembly", "Wasm", "wit", "WasmInterfaceTypes", "NEAR"]
 license = "MIT"
 name = "raen"
 repository = "https://github.com/raendev/raen"
