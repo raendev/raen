@@ -1,0 +1,12 @@
+[package]
+name = "status-message-advanced"
+version = "0.1.0"
+authors = ["Near Inc <hello@nearprotocol.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+near-sdk = { git = "https://github.com/ahalabs/near-sdk-rs", tag = "v4.0.0-4" }
+
