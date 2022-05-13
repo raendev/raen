@@ -6,7 +6,7 @@ keywords = ["WebAssembly", "Wasm", "wit", "WasmInterfaceTypes", "NEAR"]
 license = "MIT"
 name = "raen"
 repository = "https://github.com/raendev/raen"
-version = "0.0.1"
+version = "0.0.2"
 
 [dependencies]
 ## Wit/Wasm tools
