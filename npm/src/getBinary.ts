@@ -32,7 +32,7 @@ function getPlatform() {
 
 export function AWSUrl(): string {
   const [platform, arch] = getPlatform();
-  return `https://github.com/AhaLabs/${NAME}/releases/download/v${version}/${NAME}-v${version}-${arch}-${platform}.tar.gz`;
+  return `https://github.com/raendev/${NAME}/releases/download/v${version}/${NAME}-v${version}-${arch}-${platform}.tar.gz`;
 }
 
 export function getBinary(name: string = NAME): Promise<Binary> {
