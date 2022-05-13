@@ -332,16 +332,16 @@ dependencies = [
 
 [[package]]
 name = "cargo-witgen"
-version = "0.12.0"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7e2db73aa2fac230be1247e77bd6371c75e3ef98af4ef44377a15755cbc59c76"
+checksum = "294b3421e160f79c23837ce6d0737c5898d77e9f40ae03abda2fb2b58f64672c"
 dependencies = [
  "anyhow",
  "cargo_metadata",
  "clap",
  "clap_derive",
  "syn",
- "witgen_macro_helper 0.12.0",
+ "witgen_macro_helper 0.13.0",
 ]
 
 [[package]]
@@ -1968,9 +1968,9 @@ checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 
 [[package]]
 name = "wit-bindgen-gen-ts-near"
-version = "0.2.2"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "181c4415167ef7b19471414710d241ece8d6bc67725931be30d4e9ad8a09eb6d"
+checksum = "321b166f106618bb9af7b3bbd58c69b3b11764fa17863043fe017ca513ec52d9"
 dependencies = [
  "aha-wit-bindgen-gen-core",
  "anyhow",
@@ -2053,10 +2053,24 @@ dependencies = [
 ]
 
 [[package]]
-name = "witme"
-version = "0.2.6"
+name = "witgen_macro_helper"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eabe50b0471938ffec808aa53ada58416f1e9270be75e7d981ae62bb368e1db8"
+checksum = "728771ba81a0ef7d394b56516bf1b0615470946104ac3e7a6500b4da46b64126"
+dependencies = [
+ "anyhow",
+ "heck 0.4.0",
+ "proc-macro2",
+ "quote",
+ "syn",
+ "syn-file-expand",
+]
+
+[[package]]
+name = "witme"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "687fafd6b9244797210ffd4a989f02bea316621eaf2de0905a680c99a79743af"
 dependencies = [
  "anyhow",
  "cargo-witgen",

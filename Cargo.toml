@@ -10,9 +10,9 @@ version = "0.0.1"
 
 [dependencies]
 ## Wit/Wasm tools
-witme = {version = "0.2.6"}
+witme = {version = "0.3.0"}
 witgen = "0.12.0"
-cargo-witgen = "0.12.0"
+cargo-witgen = "0.13.0"
 
 ## Errors
 anyhow = "1.0.51"
