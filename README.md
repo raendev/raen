@@ -6,9 +6,15 @@ Currently supports Rust Contracts.
 cargo install raen
 ```
 
-### rust installation
+or npm
 
-[rustup](https://rustup.rs/)
+```bash
+npm i -g raen-cli
+```
+
+## Requires rust installation
+
+[rustup](https://rustup.rs/) is recommeneded
 
 ```bash
 rustup target add wasm32-unknown-unknown
@@ -18,6 +24,6 @@ rustup target add wasm32-unknown-unknown
 
 ### `build`
 
-'build' compiles a workspace of contracts and generates wit, ts, and json. The `json` is then compressed and inject into the compiled contract's Wasm file in a custom section named `json`.
+'build' compiles a workspace of contracts and generates wit, ts, and json. The `json` is then compressed and inject into the compiled contract's Wasm file in a custom section named `json`.  This file is placed into `./target/res/<crate_name>.wasm`
 
 This usually results in a smaller binary since we use walrus under the hood.
