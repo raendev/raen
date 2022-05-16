@@ -13,7 +13,6 @@ use cargo_witgen::Witgen;
 use clap::{Args, Parser};
 use witme::app::NearCommand;
 
-
 /// Build tool for NEAR smart contracts
 #[derive(Parser, Debug)]
 // #[clap(author = "Willem Wyndham <willem@ahalabs.dev>")]
@@ -49,6 +48,10 @@ pub struct Build {
     /// Compile release contract build (default is debug)
     #[clap(long)]
     release: bool,
+
+    /// Only print build file path
+    #[clap(long, short = 'q')]
+    quiet: bool,
 }
 
 impl Raen {
@@ -155,12 +158,20 @@ impl Build {
                 .join("wasm32-unknown-unknown")
                 .join(self.release_or_debug())
                 .join(&bin_name),
-            output: bin_dir.join(bin_name),
+            output: bin_dir.join(bin_name.clone()),
             data: None,
             file: Some(file),
             name: "json".to_string(),
         };
-        cmd.run()
+        cmd.run()?;
+        let output = format!("{:?}", bin_dir.join(bin_name));
+        let output = output.trim_matches('"');
+        if self.quiet {
+            println!("{}", output);
+        } else {
+            println!("Built to:\n{}", output);
+        }
+        Ok(())
     }
 
     pub fn compile(&self) -> Result<()> {
@@ -198,14 +209,17 @@ impl Build {
                 cmd.arg(p);
             })
         }
-        println!("{:#?}", cmd);
-
-        cmd.stdout(Stdio::inherit());
-        cmd.stderr(Stdio::inherit());
+        if !self.quiet {
+            cmd.stdout(Stdio::inherit());
+            cmd.stderr(Stdio::inherit());
+        } else {
+            cmd.stderr(Stdio::null());
+            cmd.stdout(Stdio::null());
+        }
         let status = cmd.status()?;
         if !status.success() {
             bail!(
-                "{:?}      {:?}",
+                "Failed Command:\n{:?} {:?}",
                 cmd.get_program(),
                 cmd.get_args()
                     .map(|s| s.to_str().unwrap())
