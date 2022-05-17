@@ -1,4 +1,3 @@
-use once_cell::sync::OnceCell;
 use std::{
     env,
     // TODO: make PR to cargo fmt to fix the following line to just `fs,`
@@ -8,9 +7,11 @@ use std::{
 };
 
 use anyhow::{bail, Ok, Result};
+use bat::PrettyPrinter;
 use cargo_metadata::{Metadata, Package, Target};
 use cargo_witgen::Witgen;
 use clap::{Args, Parser};
+use once_cell::sync::OnceCell;
 use witme::app::NearCommand;
 
 /// Build tool for NEAR smart contracts
@@ -122,7 +123,24 @@ impl Build {
                 stdout: false,
             },
         };
-        cmd.run()
+        cmd.run().map_err(|err| {
+            eprintln!("\nAdd 'witgen' as a dependency to add to type definition. e.g.\n");
+            let input = r#"use witgen::witgen;
+
+/// Type exposed by contract API
+#[witgen]
+struct Foo {}
+
+"#;
+
+            PrettyPrinter::new()
+                .input_from_bytes(input.as_bytes())
+                .language("rust")
+                .line_numbers(true)
+                .print()
+                .unwrap();
+            err
+        })
     }
 
     pub fn generate_json(&self, t: &Target) -> Result<()> {
