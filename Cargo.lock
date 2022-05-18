@@ -1376,9 +1376,9 @@ dependencies = [
 
 [[package]]
 name = "near-sdk-witgen"
-version = "0.0.1"
+version = "0.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "509ae7e311512f85a1370474f5b1dd23f00e007fe694e1320472ec6ab11045c8"
+checksum = "0e245b425c689e131453ee891c181d5ca4c3044f81d3461f784f99a8c3f4f00f"
 dependencies = [
  "anyhow",
  "proc-macro2",
@@ -2666,9 +2666,9 @@ dependencies = [
 
 [[package]]
 name = "witme"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "687fafd6b9244797210ffd4a989f02bea316621eaf2de0905a680c99a79743af"
+checksum = "172d2fd6f3813fa1ac7bdd963322c5b621e644c4a9b24c706932b049aaf47eb2"
 dependencies = [
  "anyhow",
  "cargo-witgen",
