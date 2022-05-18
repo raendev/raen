@@ -1,6 +1,6 @@
 {
   "name": "raen-cli",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Tools for generating to and from wit format",
   "keywords": [
     "WebAssembly",
