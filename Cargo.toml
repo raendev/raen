@@ -7,6 +7,7 @@ license = "MIT"
 name = "raen"
 repository = "https://github.com/raendev/raen"
 version = "0.0.5"
+default-run = "raen"
 
 [dependencies]
 ## Wit/Wasm tools
