@@ -27,3 +27,8 @@ rustup target add wasm32-unknown-unknown
 'build' compiles a workspace of contracts and generates wit, ts, and json. The `json` is then compressed and inject into the compiled contract's Wasm file in a custom section named `json`.  This file is placed into `./target/res/<crate_name>.wasm`
 
 This usually results in a smaller binary since we use walrus under the hood.
+
+
+## Guide
+
+https://rean.dev/guide
