@@ -31,4 +31,4 @@ This usually results in a smaller binary since we use walrus under the hood.
 
 ## Guide
 
-https://rean.dev/guide
+[rean.dev/guide](https://raen.dev/guide)
