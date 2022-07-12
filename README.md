@@ -8,7 +8,7 @@ Without RAEN, there's no easy way for smart contract authors or the people build
 
 RAEN leap-frogs this approach. It uses a [Wasm-compatible standard](https://github.com/bytecodealliance/wit-bindgen) that is more compact than JSON, can be auto-translated to Pagoda's ABI or other formats like [OpenRPC](https://open-rpc.org/), and will one day merge with Wasm core. And RAEN injects Wit directly into the smart contract while reducing overall contract size. No more searching GitHub for ABI files. Now they can all live right on-chain. 
 
-In a RAEN-maximized version of NEAR, anyone will be able to easily generate cross-contract call logic, TypeScript libraries, CLIs, [Admin UIs / interactive documentation](https://raen.dev/admin/), [Subgraphs](https://thegraph.com/) and more, just using the contract name.
+In a RAEN-maximized version of NEAR, anyone will be able to easily generate cross-contract call logic, TypeScript libraries, CLIs, [Admin UIs / interactive documentation](https://raen.dev/admin/), [Subgraphs](https://thegraph.com/) and more, just using a contract name.
 
 The best part? Getting started couldn't be easier. It's one command. Just build your contracts with `raen build`.
 
