@@ -16,27 +16,6 @@ The best part? Getting started couldn't be easier. It's one command. Just build 
 
 https://user-images.githubusercontent.com/221614/178541903-7f17b06c-c576-47b1-8c9d-976e43339b9c.mp4
 
-# Why
-
-For smart contract authors:
-
-- Easily see & call all methods in your smart contract with [RAEN Admin](https://raen.dev/admin)
-
-# About
-
-With RAEN, you can:
-
-* `build`: compile a contract, generate its Application Contract Interface (ACI), and inject it into a custom section of the contract's [WebAssembly][Wasm] (Wasm) binary.
-* `fetch` _[coming soon]_: use the ACI of a deployed contract to generate source code bindings for cross contract calls and client interfaces.
-
-NEAR works with any programming language that compiles to Wasm, but the most advanced NEAR SDK and documentation currently exist [for Rust](https://www.near-sdk.io/).
-
-RAEN, too, is built around a [language-agnostic standard][Wit], but currently only works with contracts written in [Rust](https://www.rust-lang.org/).
-
-  [Wasm]: https://webassembly.org/
-  [Wit]: https://github.com/bytecodealliance/wit-bindgen/blob/main/WIT.md
-
-
 ### About the name
 
 "RAEN" is "NEAR" spelled backwards. It is pronounced the same as "rain".
