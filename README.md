@@ -2,11 +2,25 @@
 
 Just `raen build` to add fully-typed, discoverable interfaces to your smart contracts.
 
-[RAEN Admin](https://raen.dev/admin) and New Tools Coming Soon can use these interfaces to make your life easier. And make it easier for anyone, present or future, to build apps on your contracts.
+[RAEN Admin](https://raen.dev/admin) and New Tools Coming Soon can use these interfaces to make life easier.
+
+Without RAEN, there's no easy way for smart contract authors or the people building apps on top of their contracts to know what methods a smart contract has, or what arguments they take. Ethereum solves this with [ABIs](https://docs.soliditylang.org/en/develop/abi-spec.html), JSON files that contract authors need to distribute off-chain to app-builders or documentation-maintainers who want to integrate with or describe the contract. [Pagoda fka Near Inc](https://near.org/blog/announcing-the-launch-of-pagoda-the-worlds-first-web3-startup-platform/) is working on [a clone of Ethereum's approach](https://github.com/near/near-sdk-rs/blob/41eb838b0d745394d7530aabe363f80dfc649a0c/near-sdk/src/private). 
+
+RAEN leap-frogs this approach. It uses a [Wasm-compatible standard](https://github.com/bytecodealliance/wit-bindgen) that is more compact than JSON, can be auto-translated to Pagoda's ABI or other formats like [OpenRPC](https://open-rpc.org/), and will one day merge with Wasm core. And RAEN uses smart compression to inject interface information directly into the smart contract while reducing overall contract size. No more searching GitHub for ABI files. Now they can all live right on-chain. 
+
+In a RAEN-maximized version of NEAR, anyone will be able to easily generate cross-contract call logic, TypeScript libraries, CLIs, [Admin UIs / interactive documentation](https://raen.dev/admin/), [Subgraphs](https://thegraph.com/) and more, just using the contract name.
+
+The best part? Getting started couldn't be easier. It's one command. Just build your contracts with `raen build`.
 
 **Rust-only**, for now. New to Rust or NEAR? Check out **[The RAEN Guide](https://raen.dev/guide)**.
 
 https://user-images.githubusercontent.com/221614/178541903-7f17b06c-c576-47b1-8c9d-976e43339b9c.mp4
+
+# Why
+
+For smart contract authors:
+
+- Easily see & call all methods in your smart contract with [RAEN Admin](https://raen.dev/admin)
 
 # About
 
