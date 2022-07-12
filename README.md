@@ -1,19 +1,20 @@
 # RAEN 🌧
 
-A build tool for NEAR smart contracts.
+Just `raen build` to add fully-typed, discoverable interfaces to your smart contracts.
 
-With RAEN, you can:
+[RAEN Admin](https://raen.dev/admin) and New Tools Coming Soon can use these interfaces to make life easier.
 
-* `build`: compile a contract, generate its Application Contract Interface (ACI), and inject it into a custom section of the contract's [WebAssembly][Wasm] (Wasm) binary.
-* `fetch` _[coming soon]_: use the ACI of a deployed contract to generate source code bindings for cross contract calls and client interfaces.
+Without RAEN, there's no easy way for smart contract authors or the people building apps on top of their contracts to know what methods a smart contract has, or what arguments they take. Ethereum solves this with [ABIs](https://docs.soliditylang.org/en/develop/abi-spec.html), JSON files that contract authors need to distribute off-chain to app-builders or documentation-maintainers who want to integrate with or describe the contract. [Pagoda fka Near Inc](https://near.org/blog/announcing-the-launch-of-pagoda-the-worlds-first-web3-startup-platform/) is working on [a clone of Ethereum's approach](https://github.com/near/near-sdk-rs/blob/41eb838b0d745394d7530aabe363f80dfc649a0c/near-sdk/src/private). 
 
-NEAR works with any programming language that compiles to Wasm, but the most advanced NEAR SDK and documentation currently exist [for Rust](https://www.near-sdk.io/).
+RAEN leap-frogs this approach. It uses a [Wasm-compatible standard](https://github.com/bytecodealliance/wit-bindgen) that is more compact than JSON, can be auto-translated to Pagoda's ABI or other formats like [OpenRPC](https://open-rpc.org/), and will one day merge with Wasm core. And RAEN injects Wit directly into the smart contract while reducing overall contract size. No more searching GitHub for ABI files. Now they can all live right on-chain. 
 
-RAEN, too, is built around a [language-agnostic standard][Wit], but currently only works with contracts written in [Rust](https://www.rust-lang.org/).
+In a RAEN-maximized version of NEAR, anyone will be able to easily generate cross-contract call logic, TypeScript libraries, CLIs, [Admin UIs / interactive documentation](https://raen.dev/admin/), [Subgraphs](https://thegraph.com/) and more, just using a contract name.
 
-  [Wasm]: https://webassembly.org/
-  [Wit]: https://github.com/bytecodealliance/wit-bindgen/blob/main/WIT.md
+The best part? Getting started couldn't be easier. It's one command. Just build your contracts with `raen build`.
 
+**Rust-only**, for now. New to Rust or NEAR? Check out **[The RAEN Guide](https://raen.dev/guide)**.
+
+https://user-images.githubusercontent.com/221614/178541903-7f17b06c-c576-47b1-8c9d-976e43339b9c.mp4
 
 ### About the name
 
@@ -21,6 +22,8 @@ RAEN, too, is built around a [language-agnostic standard][Wit], but currently on
 
 
 # Install
+
+New to Rust? [Step-by-step instructions on the Guide](https://raen.dev/guide/intro/getting-set-up.html).
 
 ## Rust
 
