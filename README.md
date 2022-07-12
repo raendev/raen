@@ -1,6 +1,14 @@
 # RAEN 🌧
 
-A build tool for NEAR smart contracts.
+Just `raen build` to add fully-typed, discoverable interfaces to your smart contracts.
+
+[RAEN Admin](https://raen.dev/admin) and New Tools Coming Soon can use these interfaces to make your life easier. And make it easier for anyone, present or future, to build apps on your contracts.
+
+**Rust-only**, for now. New to Rust or NEAR? Check out **[The RAEN Guide](https://raen.dev/guide)**.
+
+https://user-images.githubusercontent.com/221614/178541903-7f17b06c-c576-47b1-8c9d-976e43339b9c.mp4
+
+# About
 
 With RAEN, you can:
 
@@ -21,6 +29,8 @@ RAEN, too, is built around a [language-agnostic standard][Wit], but currently on
 
 
 # Install
+
+New to Rust? [Step-by-step instructions on the Guide](https://raen.dev/guide/intro/getting-set-up.html).
 
 ## Rust
 
