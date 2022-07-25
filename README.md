@@ -121,6 +121,23 @@ You probably need to add a `witgen` macro to the missing type
 Add 'witgen' as a dependency to add to type definition. e.g.
 
 Error: no type named `amount`
+
+// Or 
+You probably need to add a `witgen` macro to the missing type
+
+Add 'witgen' as a dependency to add to type definition. e.g.
+
+   1 use witgen::witgen;
+   2 
+   3 /// Type exposed by contract API
+   4 #[witgen]
+   5 struct Foo {}
+   6 
+Error: no type named `amount`
+     --> index.ts:9:73
+      |
+    9 | transfer-from-escrow: function(destination-account: account-id, amount: amount)
+      |                                                                         ^-----
 ```
 
 To fix this:
