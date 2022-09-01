@@ -12,6 +12,7 @@ use cargo_metadata::{Package, Target};
 use cargo_witgen::Witgen;
 use clap::{Args, Parser};
 use clap_cargo_extra::ClapCargo;
+use filetime::FileTime;
 use witme::app::NearCommand;
 
 /// Build tool for NEAR smart contracts
@@ -65,19 +66,32 @@ impl Build {
         self.cargo
             .current_packages()?
             .into_iter()
-            .try_for_each(|p| self.exec_package(p))?;
+            .try_for_each(|p| {
+                self.exec_package(p)
+                    .with_context(|| format!("Failed to build package: {}", p.name))
+            })?;
         Ok(())
     }
 
     pub fn exec_package(&self, p: &Package) -> Result<()> {
-        println!("Executing {}", p.name);
+        if !self.quiet {
+            println!("Building {}", p.name);
+        }
         if p.targets.is_empty() {
             bail!("no targets in package {}", p.name)
         }
         let target = &p.targets[0];
-        self.generate_wit(target)?;
-        self.generate_json(target)?;
-        self.inject_binary(target)
+        if self.should_repuild(target)? {
+            self.generate_wit(target)?;
+            self.generate_json(target)?;
+            self.inject_binary(target)?;
+        } else if self.quiet {
+            println!(
+                "{}",
+                self.output_bin(&Self::bin_name(target))?.to_string_lossy()
+            );
+        }
+        Ok(())
     }
 
     pub fn wit_out_dir(&self, t: &Target) -> Result<PathBuf> {
@@ -149,12 +163,12 @@ struct Foo {}
         let compressed_data = compress_file(&output_dir.join("index.schema.json"))?;
         let file = output_dir.join("index.schema.json.br");
         fs::write(&file, compressed_data).map_err(anyhow::Error::from)?;
-        let bin_name = format!("{}.wasm", t.name.replace('-', "_"));
+        let bin_name = Self::bin_name(t);
         let bin_dir = self.bin_dir()?;
         fs::create_dir_all(&bin_dir)?;
         let cmd = NearCommand::Inject {
             input: self.built_bin(&bin_name)?,
-            output: bin_dir.join(bin_name.clone()),
+            output: self.output_bin(&bin_name)?,
             data: None,
             file: Some(file),
             name: "json".to_string(),
@@ -201,9 +215,18 @@ struct Foo {}
         Ok(())
     }
 
+    pub fn bin_name(target: &Target) -> String {
+        format!("{}.wasm", target.name.replace('-', "_"))
+    }
+
+    pub fn output_bin(&self, bin_name: &str) -> Result<PathBuf> {
+        let bin_dir = self.bin_dir()?;
+        Ok(bin_dir.join(bin_name))
+    }
+
     pub fn bin_dir(&self) -> Result<PathBuf> {
         Ok(self.cargo.target_dir()?.join("res"))
-}
+    }
 
     pub fn built_bin(&self, bin_name: &str) -> Result<PathBuf> {
         Ok(self
@@ -214,6 +237,17 @@ struct Foo {}
             .join(&bin_name))
     }
 
+    pub fn should_repuild(&self, t: &Target) -> Result<bool> {
+        let bin_name = &Self::bin_name(t);
+        let cargo_bin = &self.built_bin(bin_name)?;
+        let output_bin = &self.output_bin(bin_name)?;
+
+        Ok(get_time(output_bin)? < get_time(cargo_bin)?)
+    }
+}
+
+fn get_time(path: &Path) -> Result<FileTime> {
+    Ok(FileTime::from_last_modification_time(&fs::metadata(path)?))
 }
 
 fn compress_file(p: &Path) -> Result<Vec<u8>> {
