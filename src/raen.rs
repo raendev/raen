@@ -1,17 +1,17 @@
 use std::{
-    env,
+    ffi::OsStr,
     // TODO: make PR to cargo fmt to fix the following line to just `fs,`
     fs::{self},
     path::{Path, PathBuf},
     process::Stdio,
 };
 
-use anyhow::{bail, Ok, Result};
+use anyhow::{bail, Context, Ok, Result};
 use bat::PrettyPrinter;
-use cargo_metadata::{Metadata, Package, Target};
+use cargo_metadata::{Package, Target};
 use cargo_witgen::Witgen;
 use clap::{Args, Parser};
-use once_cell::sync::OnceCell;
+use clap_cargo_extra::ClapCargo;
 use witme::app::NearCommand;
 
 /// Build tool for NEAR smart contracts
@@ -32,11 +32,7 @@ pub enum TopLevelCommand {
 pub struct Build {
     // Cargo related options
     #[clap(flatten)]
-    manifest: clap_cargo::Manifest,
-    #[clap(flatten)]
-    workspace: clap_cargo::Workspace,
-    #[clap(flatten)]
-    features: clap_cargo::Features,
+    cargo: ClapCargo,
 
     /// Do not include the sdk types
     #[clap(long)]
@@ -66,45 +62,30 @@ impl Raen {
 impl Build {
     pub fn run(&self) -> Result<()> {
         self.compile()?;
-        self.packages()?
+        self.cargo
+            .current_packages()?
             .into_iter()
             .try_for_each(|p| self.exec_package(p))?;
         Ok(())
     }
-    pub fn metadata(&self) -> Result<&Metadata> {
-        static INSTANCE: OnceCell<Metadata> = OnceCell::new();
-        INSTANCE.get_or_try_init(|| {
-            let mut metadata = self.manifest.metadata();
-            self.features.forward_metadata(&mut metadata);
-            metadata.exec().map_err(Into::into)
-        })
-    }
-
-    pub fn target_dir(&self) -> Result<PathBuf> {
-        Ok(self.metadata()?.target_directory.clone().into())
-    }
-
-    pub fn packages(&self) -> Result<Vec<&Package>> {
-        let meta = self.metadata()?;
-        Ok(self.workspace.partition_packages(meta).0)
-    }
 
     pub fn exec_package(&self, p: &Package) -> Result<()> {
+        println!("Executing {}", p.name);
         if p.targets.is_empty() {
-            bail!("no targets in package")
-        } else {
-            let target = &p.targets[0];
-            self.generate_wit(target)?;
-            self.generate_json(target)?;
-            self.inject_binary(target)
+            bail!("no targets in package {}", p.name)
         }
+        let target = &p.targets[0];
+        self.generate_wit(target)?;
+        self.generate_json(target)?;
+        self.inject_binary(target)
     }
 
     pub fn wit_out_dir(&self, t: &Target) -> Result<PathBuf> {
         Ok(self
+            .cargo
             .target_dir()?
             .join("wit")
-            .join(t.name.clone().replace('-', "_")))
+            .join(t.name.replace('-', "_")))
     }
 
     pub fn generate_wit(&self, t: &Target) -> Result<()> {
@@ -123,6 +104,7 @@ impl Build {
                 stdout: false,
             },
         };
+        // Todo improve error reporting
         cmd.run().map_err(|err| {
             eprintln!("\nAdd 'witgen' as a dependency to add to type definition. e.g.\n");
             let input = r#"use witgen::witgen;
@@ -138,7 +120,7 @@ struct Foo {}
                 .language("rust")
                 .line_numbers(true)
                 .print()
-                .unwrap();
+                .unwrap_or(true);
             err
         })
     }
@@ -168,14 +150,10 @@ struct Foo {}
         let file = output_dir.join("index.schema.json.br");
         fs::write(&file, compressed_data).map_err(anyhow::Error::from)?;
         let bin_name = format!("{}.wasm", t.name.replace('-', "_"));
-        let bin_dir = self.target_dir()?.join("res");
+        let bin_dir = self.bin_dir()?;
         fs::create_dir_all(&bin_dir)?;
         let cmd = NearCommand::Inject {
-            input: self
-                .target_dir()?
-                .join("wasm32-unknown-unknown")
-                .join(self.release_or_debug())
-                .join(&bin_name),
+            input: self.built_bin(&bin_name)?,
             output: bin_dir.join(bin_name.clone()),
             data: None,
             file: Some(file),
@@ -193,40 +171,15 @@ struct Foo {}
     }
 
     pub fn compile(&self) -> Result<()> {
-        let mut cmd = std::process::Command::new(cargo());
+        let mut cmd = ClapCargo::cargo_cmd();
+        cmd.env("RUSTFLAGS", "-C link-args=-s");
         cmd.arg("build");
         cmd.arg("--target");
         cmd.arg("wasm32-unknown-unknown");
         if self.release {
             cmd.arg("--release");
         }
-        if let Some(manifest_path) = &self.manifest.manifest_path {
-            cmd.arg("--manifest-path");
-            cmd.arg(manifest_path);
-        }
-        if self.features.no_default_features {
-            cmd.arg("--no-default-features");
-        }
-        if self.features.all_features {
-            cmd.arg("--all-features");
-        } else {
-            for feature in &self.features.features {
-                cmd.arg("--features");
-                cmd.arg(feature);
-            }
-        }
-        for pack in &self.workspace.exclude {
-            cmd.arg("--exclude");
-            cmd.arg(pack);
-        }
-        if self.workspace.workspace || self.workspace.all {
-            cmd.arg("--workspace");
-        } else if !self.workspace.package.is_empty() {
-            self.workspace.package.iter().for_each(|p| {
-                cmd.arg("-p");
-                cmd.arg(p);
-            })
-        }
+        self.cargo.add_cargo_args(&mut cmd);
         if !self.quiet {
             cmd.stdout(Stdio::inherit());
             cmd.stderr(Stdio::inherit());
@@ -240,21 +193,34 @@ struct Foo {}
                 "Failed Command:\n{:?} {:?}",
                 cmd.get_program(),
                 cmd.get_args()
-                    .map(|s| s.to_str().unwrap())
-                    .collect::<Vec<&str>>()
+                    .map(OsStr::to_string_lossy)
+                    .collect::<Vec<_>>()
                     .join(" ")
             );
         }
         Ok(())
     }
+
+    pub fn bin_dir(&self) -> Result<PathBuf> {
+        Ok(self.cargo.target_dir()?.join("res"))
 }
 
-fn cargo() -> String {
-    env::var("CARGO").unwrap_or_else(|_| "cargo".to_owned())
+    pub fn built_bin(&self, bin_name: &str) -> Result<PathBuf> {
+        Ok(self
+            .cargo
+            .target_dir()?
+            .join("wasm32-unknown-unknown")
+            .join(self.release_or_debug())
+            .join(&bin_name))
+    }
+
 }
 
 fn compress_file(p: &Path) -> Result<Vec<u8>> {
-    let buf = fs::read(p).map_err(anyhow::Error::from)?.into_boxed_slice();
+    let buf = fs::read(p)
+        .map_err(anyhow::Error::from)
+        .with_context(|| format!("{}", p.to_string_lossy()))?
+        .into_boxed_slice();
     let mut out = Vec::<u8>::new();
     let params = brotli::enc::BrotliEncoderParams {
         quality: 11,

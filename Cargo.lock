@@ -92,9 +92,9 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.56"
+version = "1.0.58"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4361135be9122e0870de935d7c439aef945b9f9ddd4199a553b5270b49c82a27"
+checksum = "bb07d2053ccdbe10e2af2995a2f116c1330396493dc1269f6a91d0ae82e19704"
 
 [[package]]
 name = "arrayref"
@@ -423,7 +423,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "294b3421e160f79c23837ce6d0737c5898d77e9f40ae03abda2fb2b58f64672c"
 dependencies = [
  "anyhow",
- "cargo_metadata",
+ "cargo_metadata 0.14.2",
  "clap 3.1.8",
  "clap_derive",
  "syn",
@@ -435,6 +435,19 @@ name = "cargo_metadata"
 version = "0.14.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4acbb09d9ee8e23699b9634375c72795d095bf268439da88562cf9b501f181fa"
+dependencies = [
+ "camino",
+ "cargo-platform",
+ "semver",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "cargo_metadata"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3abb7553d5b9b8421c6de7cb02606ff15e0c6eea7d8eadd75ef013fd636bec36"
 dependencies = [
  "camino",
  "cargo-platform",
@@ -522,13 +535,26 @@ dependencies = [
 
 [[package]]
 name = "clap-cargo"
-version = "0.8.0"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "551b6aa534ced210e29bc4ea2016bc11c74770f0a2b94b29dfc1a92ab6fc28d4"
+checksum = "841b17c26cdae63b80cd9014f4fb779b761c388908bdf58e15223a08d65e9b08"
 dependencies = [
- "cargo_metadata",
+ "cargo_metadata 0.15.0",
  "clap 3.1.8",
  "doc-comment",
+]
+
+[[package]]
+name = "clap-cargo-extra"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "78372b8230d3ed2f84c58e472d3a540ed75df57ec0a94c68b29d05d82796fa55"
+dependencies = [
+ "anyhow",
+ "cargo_metadata 0.15.0",
+ "clap 3.1.8",
+ "clap-cargo",
+ "heck 0.4.0",
 ]
 
 [[package]]
@@ -1741,10 +1767,9 @@ dependencies = [
  "bat",
  "brotli",
  "cargo-witgen",
- "cargo_metadata",
+ "cargo_metadata 0.15.0",
  "clap 3.1.8",
- "clap-cargo",
- "once_cell",
+ "clap-cargo-extra",
  "predicates",
  "witgen 0.12.0",
  "witme",
@@ -2626,7 +2651,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7da7073d93878632e47f9f56dbd41531c66180ad77439f8f32727c03d830c462"
 dependencies = [
  "anyhow",
- "cargo_metadata",
+ "cargo_metadata 0.14.2",
  "heck 0.4.0",
  "hex",
  "once_cell",
