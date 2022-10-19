@@ -247,7 +247,9 @@ struct Foo {}
 }
 
 fn get_time(path: &Path) -> Result<FileTime> {
-    Ok(FileTime::from_last_modification_time(&fs::metadata(path)?))
+    Ok(FileTime::from_last_modification_time(
+        &fs::metadata(path).context(format!("failed to access {}", path.to_string_lossy()))?,
+    ))
 }
 
 fn compress_file(p: &Path) -> Result<Vec<u8>> {
