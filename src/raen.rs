@@ -69,6 +69,10 @@ impl Build {
             .try_for_each(|p| {
                 self.exec_package(p)
                     .with_context(|| format!("Failed to build package: {}", p.name))
+                    .map_err(|e| {
+                        eprintln!("{e}");
+                        e
+                    })
             })?;
         Ok(())
     }
@@ -81,7 +85,7 @@ impl Build {
             bail!("no targets in package {}", p.name)
         }
         let target = &p.targets[0];
-        if self.should_repuild(target)? {
+        if self.should_rebuild(target).unwrap_or(true) {
             self.generate_wit(target)?;
             self.generate_json(target)?;
             self.inject_binary(target)?;
@@ -187,11 +191,16 @@ struct Foo {}
     pub fn compile(&self) -> Result<()> {
         let mut cmd = ClapCargo::cargo_cmd();
         cmd.env("RUSTFLAGS", "-C link-args=-s");
+        if self.release {
+            cmd.arg("+nightly");
+        }
         cmd.arg("build");
         cmd.arg("--target");
         cmd.arg("wasm32-unknown-unknown");
         if self.release {
             cmd.arg("--release");
+            cmd.arg("-Z=build-std=std,panic_abort");
+            cmd.arg("-Z=build-std-features=panic_immediate_abort");
         }
         self.cargo.add_cargo_args(&mut cmd);
         if !self.quiet {
@@ -237,7 +246,7 @@ struct Foo {}
             .join(&bin_name))
     }
 
-    pub fn should_repuild(&self, t: &Target) -> Result<bool> {
+    pub fn should_rebuild(&self, t: &Target) -> Result<bool> {
         let bin_name = &Self::bin_name(t);
         let cargo_bin = &self.built_bin(bin_name)?;
         let output_bin = &self.output_bin(bin_name)?;
