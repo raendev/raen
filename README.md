@@ -109,6 +109,50 @@ How much does this increase your contract size? In our tests so far, contracts c
 
 This admin panel then reads in that Custom Section, decompresses the brotli, and uses [react-jsonschema-form](https://github.com/rjsf-team/react-jsonschema-form) to allow interacting with the contract.
 
+# Tips
+
+## witgen macro
+
+If you define a type that RAEN doesn't recognize (such as in this line `type Amount = Balance;` where RAEN doesn't recognize `Amount`), your build may result in an error like:
+
+```
+You probably need to add a `witgen` macro to the missing type
+
+Add 'witgen' as a dependency to add to type definition. e.g.
+
+Error: no type named `amount`
+
+// Or 
+You probably need to add a `witgen` macro to the missing type
+
+Add 'witgen' as a dependency to add to type definition. e.g.
+
+   1 use witgen::witgen;
+   2 
+   3 /// Type exposed by contract API
+   4 #[witgen]
+   5 struct Foo {}
+   6 
+Error: no type named `amount`
+     --> index.ts:9:73
+      |
+    9 | transfer-from-escrow: function(destination-account: account-id, amount: amount)
+      |                                                                         ^-----
+```
+
+To fix this:
+
+1. You might want to run `cargo add witgen` (which will edit your `Cargo.toml` to include a line like `witgen = "0.14.0"`).
+2. Add `use witgen::witgen;` near the top of the file that was causing the error.
+3. Add `#[witgen]` as a line before the definition of the type. E.g.:
+
+```
+use witgen::witgen;
+
+#[witgen]
+type Amount = Balance;
+```
+
 ## Changes
 
 Now including the following in your Cargo.toml will allow projects to include your wit types in their generated wit.
