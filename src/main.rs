@@ -5,8 +5,8 @@ use std::env;
 use anyhow::{Context, Result};
 use clap::{crate_version, FromArgMatches, IntoApp};
 
-mod raen;
 mod ext;
+mod raen;
 use crate::raen::Raen;
 
 fn main() -> Result<()> {

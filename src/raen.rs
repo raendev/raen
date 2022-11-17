@@ -3,7 +3,7 @@ use std::{
     ffi::OsStr,
     // TODO: make PR to cargo fmt to fix the following line to just `fs,`
     fs::{self},
-    path::{PathBuf},
+    path::PathBuf,
     process::Stdio,
 };
 
@@ -15,7 +15,7 @@ use clap::{Args, Parser};
 use clap_cargo_extra::{ClapCargo, TargetTools};
 use witme::app::NearCommand;
 
-use crate::ext::{PackageExt, get_time, compress_file};
+use crate::ext::{compress_file, get_time, PackageExt};
 
 /// Build tool for NEAR smart contracts
 #[derive(Parser, Debug)]
@@ -212,12 +212,12 @@ struct Foo {}
         self.cargo.cargo_build.target = Some("wasm32-unknown-unknown".to_string());
         self.cargo.cargo_build.link_args = true;
         let mut cmd = self.cargo.build_cmd();
-        if !self.quiet {
-            cmd.stdout(Stdio::inherit());
-            cmd.stderr(Stdio::inherit());
-        } else {
+        if self.quiet {
             cmd.stderr(Stdio::null());
             cmd.stdout(Stdio::null());
+        } else {
+            cmd.stdout(Stdio::inherit());
+            cmd.stderr(Stdio::inherit());
         }
         let status = cmd.status()?;
         if !status.success() {
@@ -264,14 +264,16 @@ struct Foo {}
                 let dir_str = format!("{name}{version}");
                 let out_dir = self.wit_out_dir_str(&dir_str)?;
                 let res = (
-                    p.manifest_path.parent().unwrap().join("src").join("lib.rs"),
+                    p.manifest_path
+                        .parent()
+                        .ok_or_else(|| anyhow::anyhow!("Failed to get parent of {}", p.name))?
+                        .join("src")
+                        .join("lib.rs"),
                     out_dir,
                 );
                 Ok(res)
             })
             .collect::<Result<HashSet<_>>>()
-            .and_then(|set| Ok(Vec::from_iter(set.into_iter())))
+            .and_then(|set| Ok(set.into_iter().collect::<Vec<_>>()))
     }
 }
-
-

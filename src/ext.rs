@@ -1,7 +1,7 @@
-use std::{path::Path, fs};
-use anyhow::{Result, Context};
+use anyhow::{Context, Result};
 use cargo_metadata::Package;
 use filetime::FileTime;
+use std::{fs, path::Path};
 
 pub trait PackageExt {
     fn witgen_dep(&self) -> bool;
