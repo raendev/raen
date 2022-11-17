@@ -109,6 +109,15 @@ How much does this increase your contract size? In our tests so far, contracts c
 
 This admin panel then reads in that Custom Section, decompresses the brotli, and uses [react-jsonschema-form](https://github.com/rjsf-team/react-jsonschema-form) to allow interacting with the contract.
 
+## Changes
+
+Now including the following in your Cargo.toml will allow projects to include your wit types in their generated wit.
+
+```toml
+[package.metadata.witgen]
+export = true
+```
+
 # Contribute
 
 * Clone this repository
