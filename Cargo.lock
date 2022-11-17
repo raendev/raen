@@ -20,7 +20,7 @@ version = "0.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7ae96d25ebc6222c0010eaf18aac77eb6b9ac67a58e19d9cd32f2e1d9d67fbbe"
 dependencies = [
- "aha-wit-parser",
+ "aha-wit-parser 0.0.2",
  "anyhow",
 ]
 
@@ -29,6 +29,19 @@ name = "aha-wit-parser"
 version = "0.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fca135160a5b98ceabe33b3c929ac3dea22bac8a5e4de29942536d80eb2b4c53"
+dependencies = [
+ "anyhow",
+ "id-arena",
+ "pulldown-cmark",
+ "unicode-normalization",
+ "unicode-xid",
+]
+
+[[package]]
+name = "aha-wit-parser"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bf6e535ab8eaace2f1a5faa0dcdf14f1d640b005e2921defd010699bf33bf1f1"
 dependencies = [
  "anyhow",
  "id-arena",
@@ -277,7 +290,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "15bf3650200d8bffa99015595e10f1fbd17de07abbc25bb067da79e769939bfa"
 dependencies = [
  "borsh-derive",
- "hashbrown",
+ "hashbrown 0.11.2",
 ]
 
 [[package]]
@@ -400,9 +413,9 @@ dependencies = [
 
 [[package]]
 name = "camino"
-version = "1.0.7"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6f3132262930b0522068049f5870a856ab8affc80c70d08b6ecb785771a6fc23"
+checksum = "88ad0e1e3e88dd237a156ab9f571021b8a158caa0ae44b1968a241efb5144c1e"
 dependencies = [
  "serde",
 ]
@@ -445,15 +458,16 @@ dependencies = [
 
 [[package]]
 name = "cargo_metadata"
-version = "0.15.0"
+version = "0.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3abb7553d5b9b8421c6de7cb02606ff15e0c6eea7d8eadd75ef013fd636bec36"
+checksum = "406c859255d568f4f742b3146d51851f3bfd49f734a2c289d9107c4395ee0062"
 dependencies = [
  "camino",
  "cargo-platform",
  "semver",
  "serde",
  "serde_json",
+ "thiserror",
 ]
 
 [[package]]
@@ -539,19 +553,19 @@ version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "841b17c26cdae63b80cd9014f4fb779b761c388908bdf58e15223a08d65e9b08"
 dependencies = [
- "cargo_metadata 0.15.0",
+ "cargo_metadata 0.15.1",
  "clap 3.1.8",
  "doc-comment",
 ]
 
 [[package]]
 name = "clap-cargo-extra"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "78372b8230d3ed2f84c58e472d3a540ed75df57ec0a94c68b29d05d82796fa55"
+checksum = "74e2b1b5ff581f18a7e4a47352be8e605fceb6a37c4195b50af664bf336a2543"
 dependencies = [
  "anyhow",
- "cargo_metadata 0.15.0",
+ "cargo_metadata 0.15.1",
  "clap 3.1.8",
  "clap-cargo",
  "heck 0.4.0",
@@ -1029,6 +1043,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "hashbrown"
+version = "0.12.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
+
+[[package]]
 name = "heck"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1129,12 +1149,12 @@ dependencies = [
 
 [[package]]
 name = "indexmap"
-version = "1.8.1"
+version = "1.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0f647032dfaa1f8b6dc29bd3edb7bbef4861b8b8007ebb118d6db284fd59f6ee"
+checksum = "10a35a97730320ffe8e2d410b5d3b69279b98d2c14bdb8b70ea89ecf7888d41e"
 dependencies = [
  "autocfg",
- "hashbrown",
+ "hashbrown 0.12.3",
 ]
 
 [[package]]
@@ -1148,9 +1168,9 @@ dependencies = [
 
 [[package]]
 name = "itertools"
-version = "0.10.3"
+version = "0.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a9a9d19fa1e79b6215ff29b9d6880b706147f16e9b1dbb1e4e5947b5b02bc5e3"
+checksum = "b0fd2260e829bddf4cb6ea802289de2f86d6a7a690192fbe91b3f46e0f2c8473"
 dependencies = [
  "either",
 ]
@@ -1523,9 +1543,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.10.0"
+version = "1.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "87f3e037eac156d1775da914196f0f37741a274155e34a0b7e427c35d2a2ecb9"
+checksum = "86f0b0d4bf799edbc74508c1e8bf170ff5f41238e5f8225603ca7caaae2b7860"
 
 [[package]]
 name = "onig"
@@ -1735,11 +1755,11 @@ checksum = "dbf0c48bc1d91375ae5c3cd81e3722dff1abcf81a30960240640d223f59fe0e5"
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.37"
+version = "1.0.47"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ec757218438d5fda206afc041538b2f6d889286160d649a86a24d37e1235afd1"
+checksum = "5ea3d908b0e36316caf9e9e2c4625cdde190a7e6f440d794667ed17a1855e725"
 dependencies = [
- "unicode-xid",
+ "unicode-ident",
 ]
 
 [[package]]
@@ -1755,9 +1775,9 @@ dependencies = [
 
 [[package]]
 name = "quote"
-version = "1.0.18"
+version = "1.0.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1feb54ed693b93a84e14094943b84b7c4eae204c512b7ccb95ab0c66d278ad1"
+checksum = "bbe448f377a7d6961e30f5955f9b8d106c3f5e449d493ee1b125c1d43c2b5179"
 dependencies = [
  "proc-macro2",
 ]
@@ -1772,14 +1792,14 @@ checksum = "643f8f41a8ebc4c5dc4515c82bb8abd397b527fc20fd681b7c011c2aee5d44fb"
 name = "raen"
 version = "0.0.5"
 dependencies = [
- "aha-wit-parser",
+ "aha-wit-parser 0.0.2",
  "anyhow",
  "assert_cmd",
  "assert_fs",
  "bat",
  "brotli",
  "cargo-witgen",
- "cargo_metadata 0.15.0",
+ "cargo_metadata 0.15.1",
  "clap 3.1.8",
  "clap-cargo-extra",
  "filetime",
@@ -1995,27 +2015,27 @@ dependencies = [
 
 [[package]]
 name = "semver"
-version = "1.0.7"
+version = "1.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d65bd28f48be7196d222d95b9243287f48d27aca604e08497513019ff0502cc4"
+checksum = "e25dfac463d778e353db5be2449d1cce89bd6fd23c9f1ea21310ce6e5a1b29c4"
 dependencies = [
  "serde",
 ]
 
 [[package]]
 name = "serde"
-version = "1.0.136"
+version = "1.0.147"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce31e24b01e1e524df96f1c2fdd054405f8d7376249a5110886fb4b658484789"
+checksum = "d193d69bae983fc11a79df82342761dfbf28a99fc8d203dca4c3c1b590948965"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.136"
+version = "1.0.147"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08597e7152fcd306f41838ed3e37be9eaeed2b61c42e2117266a554fab4662f9"
+checksum = "4f1d362ca8fc9c3e3a7484440752472d68a6caa98f1ab81d99b5dfe517cec852"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2024,9 +2044,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.79"
+version = "1.0.87"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e8d9fa5c3b304765ce1fd9c4c8a3de2c8db365a5b91be52f186efc675681d95"
+checksum = "6ce777b7b150d76b9cf60d28b55f5847135a003f7d7350c6be7a773508ce7d45"
 dependencies = [
  "indexmap",
  "itoa",
@@ -2101,9 +2121,9 @@ dependencies = [
 
 [[package]]
 name = "smallvec"
-version = "1.8.0"
+version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f2dd574626839106c320a323308629dcb1acfc96e32a8cba364ddc61ac23ee83"
+checksum = "a507befe795404456341dfab10cef66ead4c041f62b8b11bbb92bffe5d0953e0"
 
 [[package]]
 name = "smart-default"
@@ -2127,6 +2147,7 @@ name = "status-message"
 version = "0.1.0"
 dependencies = [
  "near-sdk",
+ "witgen-dep",
 ]
 
 [[package]]
@@ -2162,13 +2183,13 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
 name = "syn"
-version = "1.0.91"
+version = "1.0.103"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b683b2b825c8eef438b77c36a06dc262294da3d5a5813fac20da149241dcd44d"
+checksum = "a864042229133ada95abf3b54fdc62ef5ccabe9515b64717bcb9a1919e59445d"
 dependencies = [
  "proc-macro2",
  "quote",
- "unicode-xid",
+ "unicode-ident",
 ]
 
 [[package]]
@@ -2180,6 +2201,20 @@ dependencies = [
  "im-rc",
  "itertools",
  "proc-macro2",
+ "syn",
+ "thiserror",
+]
+
+[[package]]
+name = "syn-file-expand"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b6181cbea559711c240607c08763542d871f1b8988dd48e4c713e1c674642c63"
+dependencies = [
+ "im-rc",
+ "itertools",
+ "proc-macro2",
+ "quote",
  "syn",
  "thiserror",
 ]
@@ -2302,18 +2337,18 @@ checksum = "b1141d4d61095b28419e22cb0bbf02755f5e54e0526f97f1e3d1d160e60885fb"
 
 [[package]]
 name = "thiserror"
-version = "1.0.30"
+version = "1.0.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "854babe52e4df1653706b98fcfc05843010039b406875930a70e4d9644e5c417"
+checksum = "10deb33631e3c9018b9baf9dcbbc4f737320d2b576bac10f6aefa048fa407e3e"
 dependencies = [
  "thiserror-impl",
 ]
 
 [[package]]
 name = "thiserror-impl"
-version = "1.0.30"
+version = "1.0.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aa32fd3f627f367fe16f893e2597ae3c05020f8bba2666a4e6ea73d377e5714b"
+checksum = "982d17546b47146b28f7c22e3d08465f6b8903d0ea13c1660d9d84a6e7adcdbb"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2406,6 +2441,12 @@ name = "unicode-bidi"
 version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1a01404663e3db436ed2746d9fefef640d868edae3cceb81c3b8d5732fda678f"
+
+[[package]]
+name = "unicode-ident"
+version = "1.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6ceab39d59e4c9499d4e5a8ee0e2735b891bb7308ac83dfb4e80cad195c9f6f3"
 
 [[package]]
 name = "unicode-normalization"
@@ -2675,6 +2716,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "witgen"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fca6ce1c345b4e7b7c6af847f758359c4fa5cbf021044b34b69dc09543435afb"
+dependencies = [
+ "witgen_macro 0.15.0",
+]
+
+[[package]]
+name = "witgen-dep"
+version = "0.1.0"
+dependencies = [
+ "witgen 0.15.0",
+ "witgen-dep-dep",
+]
+
+[[package]]
+name = "witgen-dep-dep"
+version = "0.1.0"
+dependencies = [
+ "witgen 0.15.0",
+]
+
+[[package]]
 name = "witgen_macro"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2698,6 +2763,20 @@ dependencies = [
  "proc-macro2",
  "syn",
  "witgen_macro_helper 0.12.0",
+]
+
+[[package]]
+name = "witgen_macro"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "16b823beb9160767919b9046f49e5722d5ce4adb1f20a6626d460bb21573bd74"
+dependencies = [
+ "anyhow",
+ "once_cell",
+ "proc-macro2",
+ "quote",
+ "syn",
+ "witgen_macro_helper 0.15.0",
 ]
 
 [[package]]
@@ -2728,7 +2807,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
- "syn-file-expand",
+ "syn-file-expand 0.1.1",
 ]
 
 [[package]]
@@ -2742,7 +2821,22 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
- "syn-file-expand",
+ "syn-file-expand 0.1.1",
+]
+
+[[package]]
+name = "witgen_macro_helper"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7e1ac9606b47bc18899885e2ae1fcd8616a97dcbea499d0f9be359d11c5fe344"
+dependencies = [
+ "aha-wit-parser 0.2.0",
+ "anyhow",
+ "heck 0.4.0",
+ "proc-macro2",
+ "quote",
+ "syn",
+ "syn-file-expand 0.2.0",
 ]
 
 [[package]]

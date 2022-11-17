@@ -1,19 +1,21 @@
 use std::{
+    collections::HashSet,
     ffi::OsStr,
     // TODO: make PR to cargo fmt to fix the following line to just `fs,`
     fs::{self},
-    path::{Path, PathBuf},
+    path::{PathBuf},
     process::Stdio,
 };
 
 use anyhow::{bail, Context, Ok, Result};
 use bat::PrettyPrinter;
-use cargo_metadata::{Package, Target};
+use cargo_metadata::{camino::Utf8PathBuf, DependencyKind, Package, Target};
 use cargo_witgen::Witgen;
 use clap::{Args, Parser};
-use clap_cargo_extra::ClapCargo;
-use filetime::FileTime;
+use clap_cargo_extra::{ClapCargo, TargetTools};
 use witme::app::NearCommand;
+
+use crate::ext::{PackageExt, get_time, compress_file};
 
 /// Build tool for NEAR smart contracts
 #[derive(Parser, Debug)]
@@ -29,39 +31,35 @@ pub enum TopLevelCommand {
     Build(Build),
 }
 
-#[derive(Args, Debug)]
+#[derive(Args, Debug, Default)]
 pub struct Build {
     // Cargo related options
     #[clap(flatten)]
-    cargo: ClapCargo,
+    pub cargo: ClapCargo,
 
     /// Do not include the sdk types
     #[clap(long)]
-    no_sdk: bool,
+    pub no_sdk: bool,
 
     /// Include the types for contract standards
     #[clap(long)]
-    standards: bool,
-
-    /// Compile release contract build (default is debug)
-    #[clap(long)]
-    release: bool,
+    pub standards: bool,
 
     /// Only print build file path
     #[clap(long, short = 'q')]
-    quiet: bool,
+    pub quiet: bool,
 }
 
 impl Raen {
     pub fn run(self) -> Result<()> {
         match self.top_level_command {
-            TopLevelCommand::Build(command) => command.run(),
+            TopLevelCommand::Build(mut command) => command.run(),
         }
     }
 }
 
 impl Build {
-    pub fn run(&self) -> Result<()> {
+    pub fn run(&mut self) -> Result<()> {
         self.compile()?;
         self.cargo
             .current_packages()?
@@ -86,38 +84,67 @@ impl Build {
         }
         let target = &p.targets[0];
         if self.should_rebuild(target).unwrap_or(true) {
-            self.generate_wit(target)?;
+            self.generate_wit_from_target(target, p)?;
             self.generate_json(target)?;
             self.inject_binary(target)?;
         } else if self.quiet {
-            println!(
-                "{}",
-                self.output_bin(&Self::bin_name(target))?.to_string_lossy()
-            );
+            println!("{}", self.output_bin(target)?.to_string_lossy());
         }
         Ok(())
     }
 
     pub fn wit_out_dir(&self, t: &Target) -> Result<PathBuf> {
+        self.wit_out_dir_str(&t.name)
+    }
+
+    pub fn wit_out_dir_str(&self, name: &str) -> Result<PathBuf> {
         Ok(self
             .cargo
             .target_dir()?
             .join("wit")
-            .join(t.name.replace('-', "_")))
+            .join(name.replace('-', "_")))
     }
 
-    pub fn generate_wit(&self, t: &Target) -> Result<()> {
-        let output_dir = self.wit_out_dir(t)?;
+    pub fn generate_wit_from_target(&self, target: &Target, p: &Package) -> Result<()> {
+        let output_dir = self.wit_out_dir(target)?;
+        let input_src = target.src_path.clone().into();
+        let mut prefix_file = vec![];
+        for (input, output_dir) in self.get_witgen_deps(p)? {
+            prefix_file.push(output_dir.join("index.wit"));
+            if !output_dir.exists() {
+                fs::create_dir_all(output_dir.as_path())?;
+                self.generate_wit(
+                    input.into(),
+                    output_dir,
+                    None,
+                    Some(false),
+                    Some(false),
+                    false,
+                )?;
+            }
+        }
+        self.generate_wit(input_src, output_dir, Some(prefix_file), None, None, true)
+    }
+
+    pub fn generate_wit(
+        &self,
+        input_src: PathBuf,
+        output_dir: PathBuf,
+        prefix_file: Option<Vec<PathBuf>>,
+        no_sdk: Option<bool>,
+        standards: Option<bool>,
+        typescript: bool,
+    ) -> Result<()> {
         let output = output_dir.join("index.wit");
         let cmd = NearCommand::Wit {
-            typescript: Some(output_dir),
-            sdk: !self.no_sdk,
-            standards: self.standards,
+            typescript: if typescript { Some(output_dir) } else { None },
+            sdk: no_sdk.unwrap_or(!self.no_sdk),
+            standards: standards.unwrap_or(self.standards),
             witgen: Witgen {
-                input: Some(t.src_path.clone().into()),
+                input: Some(input_src),
                 input_dir: PathBuf::new(),
                 output,
-                prefix_file: vec![],
+                prefix_file: prefix_file.unwrap_or_default(),
                 prefix_string: vec![],
                 stdout: false,
             },
@@ -153,15 +180,6 @@ struct Foo {}
         };
         cmd.run()
     }
-
-    fn release_or_debug(&self) -> &str {
-        if self.release {
-            "release"
-        } else {
-            "debug"
-        }
-    }
-
     pub fn inject_binary(&self, t: &Target) -> Result<()> {
         let output_dir = self.wit_out_dir(t)?;
         let compressed_data = compress_file(&output_dir.join("index.schema.json"))?;
@@ -170,9 +188,11 @@ struct Foo {}
         let bin_name = Self::bin_name(t);
         let bin_dir = self.bin_dir()?;
         fs::create_dir_all(&bin_dir)?;
+        let input = self.cargo.built_bin(t)?;
+        let output = self.output_bin(t)?;
         let cmd = NearCommand::Inject {
-            input: self.built_bin(&bin_name)?,
-            output: self.output_bin(&bin_name)?,
+            input,
+            output,
             data: None,
             file: Some(file),
             name: "json".to_string(),
@@ -188,21 +208,10 @@ struct Foo {}
         Ok(())
     }
 
-    pub fn compile(&self) -> Result<()> {
-        let mut cmd = ClapCargo::cargo_cmd();
-        cmd.env("RUSTFLAGS", "-C link-args=-s");
-        if self.release {
-            cmd.arg("+nightly");
-        }
-        cmd.arg("build");
-        cmd.arg("--target");
-        cmd.arg("wasm32-unknown-unknown");
-        if self.release {
-            cmd.arg("--release");
-            cmd.arg("-Z=build-std=std,panic_abort");
-            cmd.arg("-Z=build-std-features=panic_immediate_abort");
-        }
-        self.cargo.add_cargo_args(&mut cmd);
+    pub fn compile(&mut self) -> Result<()> {
+        self.cargo.cargo_build.target = Some("wasm32-unknown-unknown".to_string());
+        self.cargo.cargo_build.link_args = true;
+        let mut cmd = self.cargo.build_cmd();
         if !self.quiet {
             cmd.stdout(Stdio::inherit());
             cmd.stderr(Stdio::inherit());
@@ -228,50 +237,41 @@ struct Foo {}
         format!("{}.wasm", target.name.replace('-', "_"))
     }
 
-    pub fn output_bin(&self, bin_name: &str) -> Result<PathBuf> {
+    pub fn output_bin(&self, target: &Target) -> Result<PathBuf> {
         let bin_dir = self.bin_dir()?;
-        Ok(bin_dir.join(bin_name))
+        Ok(bin_dir.join(target.wasm_bin_name()))
     }
 
     pub fn bin_dir(&self) -> Result<PathBuf> {
         Ok(self.cargo.target_dir()?.join("res"))
     }
 
-    pub fn built_bin(&self, bin_name: &str) -> Result<PathBuf> {
-        Ok(self
-            .cargo
-            .target_dir()?
-            .join("wasm32-unknown-unknown")
-            .join(self.release_or_debug())
-            .join(&bin_name))
-    }
-
     pub fn should_rebuild(&self, t: &Target) -> Result<bool> {
-        let bin_name = &Self::bin_name(t);
-        let cargo_bin = &self.built_bin(bin_name)?;
-        let output_bin = &self.output_bin(bin_name)?;
+        let cargo_bin = &self.cargo.built_bin(t)?;
+        let output_bin = &self.output_bin(t)?;
 
         Ok(get_time(output_bin)? < get_time(cargo_bin)?)
     }
+
+    pub fn get_witgen_deps(&self, package: &Package) -> Result<Vec<(Utf8PathBuf, PathBuf)>> {
+        self.cargo
+            .get_deps(package, DependencyKind::Normal)?
+            .into_iter()
+            .filter(|p| Package::witgen_dep(p))
+            .map(|p| {
+                let version = &p.version;
+                let name = &p.name;
+                let dir_str = format!("{name}{version}");
+                let out_dir = self.wit_out_dir_str(&dir_str)?;
+                let res = (
+                    p.manifest_path.parent().unwrap().join("src").join("lib.rs"),
+                    out_dir,
+                );
+                Ok(res)
+            })
+            .collect::<Result<HashSet<_>>>()
+            .and_then(|set| Ok(Vec::from_iter(set.into_iter())))
+    }
 }
 
-fn get_time(path: &Path) -> Result<FileTime> {
-    Ok(FileTime::from_last_modification_time(
-        &fs::metadata(path).context(format!("failed to access {}", path.to_string_lossy()))?,
-    ))
-}
 
-fn compress_file(p: &Path) -> Result<Vec<u8>> {
-    let buf = fs::read(p)
-        .map_err(anyhow::Error::from)
-        .with_context(|| format!("{}", p.to_string_lossy()))?
-        .into_boxed_slice();
-    let mut out = Vec::<u8>::new();
-    let params = brotli::enc::BrotliEncoderParams {
-        quality: 11,
-        ..Default::default()
-    };
-
-    brotli::BrotliCompress(&mut buf.as_ref(), &mut out, &params)?;
-    Ok(out)
-}

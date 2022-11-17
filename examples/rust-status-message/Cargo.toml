@@ -9,4 +9,4 @@ crate-type = ["cdylib"]
 
 [dependencies]
 near-sdk = { git = "https://github.com/ahalabs/near-sdk-rs", tag = "v4.0.0-4" }
-
+witgen-dep = { path = "../witgen-dep"}

@@ -6,6 +6,7 @@ use anyhow::{Context, Result};
 use clap::{crate_version, FromArgMatches, IntoApp};
 
 mod raen;
+mod ext;
 use crate::raen::Raen;
 
 fn main() -> Result<()> {
