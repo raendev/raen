@@ -5,8 +5,8 @@ use raen::raen::Build;
 #[test]
 fn compile() {
     use std::fs;
-    fs::remove_dir_all("./target/res").unwrap();
-    fs::remove_dir_all("./target/wit").unwrap();
+    fs::remove_dir_all("./target/res").unwrap_or_default();
+    fs::remove_dir_all("./target/wit").unwrap_or_default();
     let mut build = Build::default();
     build.cargo.cargo_build.release = true;
     build.cargo.workspace.exclude.push("raen".to_string());
