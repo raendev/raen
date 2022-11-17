@@ -153,6 +153,15 @@ use witgen::witgen;
 type Amount = Balance;
 ```
 
+## Changes
+
+Now including the following in your Cargo.toml will allow projects to include your wit types in their generated wit.
+
+```toml
+[package.metadata.witgen]
+export = true
+```
+
 # Contribute
 
 * Clone this repository

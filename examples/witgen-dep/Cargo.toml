@@ -1,0 +1,15 @@
+[package]
+name = "witgen-dep"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+witgen = "0.15.0"
+witgen-dep-dep = { path = "../witgen-dep-dep" }
+
+[package.metadata.witgen]
+export = true
