@@ -7,7 +7,10 @@ fn compile() {
     use std::fs;
     fs::remove_dir_all("./target/res").unwrap_or_default();
     fs::remove_dir_all("./target/wit").unwrap_or_default();
-    let mut build = Build::default();
+    let mut build = Build {
+        wasm_opt: true,
+        ..Build::default()
+    };
     build.cargo.cargo_build.release = true;
     build.cargo.workspace.exclude.push("raen".to_string());
     build.cargo.workspace.workspace = true;
