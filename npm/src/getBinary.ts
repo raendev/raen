@@ -30,7 +30,7 @@ function getPlatform() {
   throw new Error(`Unsupported platform: ${type} ${arch}`);
 }
 
-export function AWSUrl(): string {
+export function GithubUrl(): string {
   const [platform, arch] = getPlatform();
   return `https://github.com/raendev/${NAME}/releases/download/v${version}/${NAME}-v${version}-${arch}-${platform}.tar.gz`;
 }
@@ -47,7 +47,8 @@ export function getBinary(name: string = NAME): Promise<Binary> {
   // Will use version after publishing to AWS
   // const version = require("./package.json").version;
   const fromEnv = process.env["RAEN_ARTIFACT_URL"];
-  const urls = [AWSUrl()];
+  const urls = [GithubUrl()];
+  console.log(urls)
   if (fromEnv) {
     urls.unshift(fromEnv);
   }

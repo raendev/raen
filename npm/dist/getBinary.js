@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getBinary = exports.AWSUrl = void 0;
+exports.getBinary = exports.GithubUrl = void 0;
 const _1 = require(".");
 const path_1 = require("path");
 const os = require("os");
@@ -27,11 +27,11 @@ function getPlatform() {
     }
     throw new Error(`Unsupported platform: ${type} ${arch}`);
 }
-function AWSUrl() {
+function GithubUrl() {
     const [platform, arch] = getPlatform();
     return `https://github.com/raendev/${NAME}/releases/download/v${version}/${NAME}-v${version}-${arch}-${platform}.tar.gz`;
 }
-exports.AWSUrl = AWSUrl;
+exports.GithubUrl = GithubUrl;
 function getBinary(name = NAME) {
     if (!process.env["RAEN_BIN_PATH"]) {
         process.env["RAEN_BINARY_PATH"] = (0, path_1.join)(os.homedir(), `.${NAME}`, NAME);
@@ -39,7 +39,8 @@ function getBinary(name = NAME) {
     // Will use version after publishing to AWS
     // const version = require("./package.json").version;
     const fromEnv = process.env["RAEN_ARTIFACT_URL"];
-    const urls = [AWSUrl()];
+    const urls = [GithubUrl()];
+    console.log(urls);
     if (fromEnv) {
         urls.unshift(fromEnv);
     }

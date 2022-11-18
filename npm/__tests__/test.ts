@@ -1,7 +1,7 @@
 import test from "ava";
-import { join, resolve } from "path";
+import { join } from "path";
 import { Binary } from "../src";
-import { AWSUrl } from "../src/getBinary";
+import { GithubUrl } from "../src/getBinary";
 import { fileExists, inherit, rm } from "../src/utils";
 
 process.env['PATH'] = "";
@@ -10,7 +10,7 @@ const name = "RAEN";
 const LOCAL_PATH = Binary.DEFAULT_INSTALL_DIR;
 const LOCAL_BIN_PATH = join(LOCAL_PATH, name);
 const fakeUrl = "https://example.com";
-const realUrl = AWSUrl();
+const realUrl = GithubUrl();
 
 
 
@@ -71,12 +71,6 @@ test("can install file to destination with multiple urls", async (t) => {
   t.assert(await bin.exists());
 });
 
-test("can use local file", async (t) => {
-  const localPath = resolve(join(__dirname, "..", "test_files"));
-  const bin = await Binary.create(name, realUrl, localPath);
-  t.is(bin.installDir, localPath);
-  t.assert(await bin.exists());
-});
 
 test("can install and then run", async (t) => {
   const p = join(TEST_BIN_DESTINATION, "install_then_run");
