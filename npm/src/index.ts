@@ -61,10 +61,9 @@ export class Binary {
     path: string | URL | string[] | URL[],
     destination?: string
   ): Promise<Binary> {
-    const bin = new Binary(name, path, destination ?? (await searchPath(name)));
-    if (destination === bin.installDir) {
-      await fs.mkdir(bin.installDir, { recursive: true });
-    }
+    let binDir = destination ?? (await searchPath(name)) ?? Binary.DEFAULT_INSTALL_DIR;
+    const bin = new Binary(name, path, binDir);
+    await fs.mkdir(binDir!, { recursive: true });    
     return bin;
   }
 

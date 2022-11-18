@@ -40,7 +40,6 @@ function getBinary(name = NAME) {
     // const version = require("./package.json").version;
     const fromEnv = process.env["RAEN_ARTIFACT_URL"];
     const urls = [GithubUrl()];
-    console.log(urls);
     if (fromEnv) {
         urls.unshift(fromEnv);
     }
