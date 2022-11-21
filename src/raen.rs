@@ -295,11 +295,10 @@ struct Foo {}
     fn optimize(&self, file: &str) -> Result<u64> {
         let input = PathBuf::from(file);
         let output = &input;
-        let input = &input;
         let wasm_out = PathBuf::from(output);
         let mut options = OptimizationOptions::new_optimize_for_size_aggressively();
         options.converge = true;
         options.run(input, &wasm_out)?;
-        Ok(std::fs::metadata(&wasm_out)?.len())
+        Ok(std::fs::metadata(wasm_out)?.len())
     }
 }
