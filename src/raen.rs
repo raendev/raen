@@ -13,6 +13,7 @@ use cargo_metadata::{camino::Utf8PathBuf, DependencyKind, Package, Target};
 use cargo_witgen::Witgen;
 use clap::{Args, Parser};
 use clap_cargo_extra::{ClapCargo, TargetTools};
+use wasm_opt::OptimizationOptions;
 use witme::app::NearCommand;
 
 use crate::ext::{compress_file, get_time, PackageExt};
@@ -48,6 +49,9 @@ pub struct Build {
     /// Only print build file path
     #[clap(long, short = 'q')]
     pub quiet: bool,
+    /// Use wasm-opt to further optimize the size of generated the Wasm binary
+    #[clap(long, short = 'w')]
+    pub wasm_opt: bool,
 }
 
 impl Raen {
@@ -191,7 +195,7 @@ struct Foo {}
         let input = self.cargo.built_bin(t)?;
         let output = self.output_bin(t)?;
         let cmd = NearCommand::Inject {
-            input,
+            input: input.clone(),
             output,
             data: None,
             file: Some(file),
@@ -200,10 +204,20 @@ struct Foo {}
         cmd.run()?;
         let output = format!("{:?}", bin_dir.join(bin_name));
         let output = output.trim_matches('"');
+        let extra = if self.wasm_opt {
+            let diff = std::fs::metadata(&input)?.len() as i64 - self.optimize(output)? as i64;
+            if diff < 0 {
+                "The orginal file was smaller than the added types. Report to the `https://github.com/raendev/raen/issues` for help.".to_owned()
+            } else {
+                format!("Saved {diff} bytes")
+            }
+        } else {
+            "".to_owned()
+        };
         if self.quiet {
             println!("{}", output);
         } else {
-            println!("Built to:\n{}", output);
+            println!("Built to:\n{}\n{}", output, extra);
         }
         Ok(())
     }
@@ -274,6 +288,17 @@ struct Foo {}
                 Ok(res)
             })
             .collect::<Result<HashSet<_>>>()
-            .and_then(|set| Ok(set.into_iter().collect::<Vec<_>>()))
+            .map(IntoIterator::into_iter)
+            .map(Iterator::collect::<Vec<_>>)
+    }
+
+    fn optimize(&self, file: &str) -> Result<u64> {
+        let input = PathBuf::from(file);
+        let output = &input;
+        let wasm_out = PathBuf::from(output);
+        let mut options = OptimizationOptions::new_optimize_for_size_aggressively();
+        options.converge = true;
+        options.run(input, &wasm_out)?;
+        Ok(std::fs::metadata(wasm_out)?.len())
     }
 }
