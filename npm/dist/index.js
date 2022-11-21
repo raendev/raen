@@ -65,10 +65,10 @@ class Binary {
      * @returns
      */
     static async create(name, path, destination) {
-        const bin = new Binary(name, path, destination !== null && destination !== void 0 ? destination : (await (0, utils_1.searchPath)(name)));
-        if (destination === bin.installDir) {
-            await fs.mkdir(bin.installDir, { recursive: true });
-        }
+        var _a;
+        let binDir = (_a = destination !== null && destination !== void 0 ? destination : (await (0, utils_1.searchPath)(name))) !== null && _a !== void 0 ? _a : Binary.DEFAULT_INSTALL_DIR;
+        const bin = new Binary(name, path, binDir);
+        await fs.mkdir(binDir, { recursive: true });
         return bin;
     }
     get binPath() {
