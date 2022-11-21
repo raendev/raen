@@ -49,7 +49,7 @@ pub struct Build {
     /// Only print build file path
     #[clap(long, short = 'q')]
     pub quiet: bool,
-
+    /// Use wasm-opt to further optimize the size of generated the Wasm binary
     #[clap(long, short = 'w')]
     pub wasm_opt: bool,
 }
