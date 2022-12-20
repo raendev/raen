@@ -111,6 +111,20 @@ This admin panel then reads in that Custom Section, decompresses the brotli, and
 
 # Tips
 
+## one-liners
+
+Dev-deploy in one command:
+
+    near dev-deploy $(raen build --release -q)
+    
+Regular deploy in one command:
+
+    near deploy CONTRACT-NAME $(raen build --release -q)
+    
+Explanation: this uses [command subtitution](https://stackoverflow.com/a/19462303/249801) to put the output of `raen build` at the right spot in the `near [dev-]deploy` command. The `-q` option puts `raen build` in _quiet_ mode, meaning that it only outputs the location of the built file.
+
+See `near dev-deploy --help`, `near deploy --help`, and `raen build --help` for more info.
+
 ## witgen macro
 
 If you define a type that RAEN doesn't recognize (such as in this line `type Amount = Balance;` where RAEN doesn't recognize `Amount`), your build may result in an error like:
